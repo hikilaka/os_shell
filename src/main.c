@@ -12,5 +12,5 @@ int main(int argc, char* argv[]) {
         shell_err("unable to initialize commands\n");
     }
 
-    return 0;
+    return shell_repl();
 }

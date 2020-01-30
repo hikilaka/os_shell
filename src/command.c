@@ -59,6 +59,7 @@ int cmd_register(struct user_cmd* cmd) {
 
     printf("registering command %s @ %zu\n", cmd->name, cmd_list_cnt);
     
+    // todo: determine if memcpy fails
     memcpy(&cmd_list[cmd_list_cnt], cmd, sizeof(struct user_cmd));
     cmd_list_cnt += 1;
     return 0;
