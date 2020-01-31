@@ -27,7 +27,7 @@ int shell_repl(void) {
     struct user_input input;
     
     do {
-        printf("> ");
+        printf("%s:%s$ ", getlogin(), getenv("PWD"));
         fflush(stdout); // printf might not immediately write without '\n'
 
         input_read_cnt = read(STDIN_FILENO, input_buf, input_buf_sz - 1);
@@ -45,11 +45,6 @@ int shell_repl(void) {
         }
 
         parse_input(&input, input_buf, input_read_cnt);
-
-        printf("command = \"%s\"\n", input.action);
-        for (int i = 0; i < input.argc; i++) {
-            printf(" - argv %d = \"%s\"\n", i + 1, input.argv[i]);
-        }
 
         if (exec_input(&input)) {
             shell_err("unable to execute command %s\n", input.action);
@@ -127,6 +122,14 @@ void parse_input(struct user_input* input, char* buf, size_t buf_sz) {
 }
 
 int exec_input(struct user_input* input) {
+    struct user_cmd* cmd;
+
+    if (!cmd_find(input->action, &cmd)) {
+        return cmd->handle(input->argc, input->argv);
+    } else {
+        printf("invalid command: \"%s\"\n", input->action);
+    }
+
     return 0;
 }
 

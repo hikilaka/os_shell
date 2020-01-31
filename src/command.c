@@ -57,14 +57,20 @@ int cmd_register(struct user_cmd* cmd) {
         }
     }
 
-    printf("registering command %s @ %zu\n", cmd->name, cmd_list_cnt);
-    
-    // todo: determine if memcpy fails
     memcpy(&cmd_list[cmd_list_cnt], cmd, sizeof(struct user_cmd));
     cmd_list_cnt += 1;
     return 0;
 }
 
-int cmd_find(char* name, struct user_cmd* cmd) {
-    return 0;
+int cmd_find(char* name, struct user_cmd** cmd) {
+    assert(cmd_list != NULL);
+
+    for (size_t i = 0; i < cmd_list_cnt; i++) {
+        if (strcmp(name, cmd_list[i].name) == 0) {
+            *cmd = &cmd_list[i];
+            return 0;
+        }
+    }
+
+    return 1;
 }
