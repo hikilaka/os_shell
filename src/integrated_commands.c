@@ -18,7 +18,8 @@ static struct user_cmd integrated_cmds[] = {
     { "ls",         dir_list }, // because i dislike 'dir'
     { "clr",        screen_clear },
     { "echo",       screen_write },
-    { "quit",       shell_exit },
+    { "exit",       shell_exit },
+    { "quit",       shell_exit }, // alias to quit
     { "pause",      shell_pause },
     { "help",       print_help },
     { NULL, NULL }
