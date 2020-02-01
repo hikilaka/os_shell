@@ -28,15 +28,13 @@ int exec_progam(struct user_input* input, int fd[2]);
 
 void release_input(struct user_input* input);
 
-void shell_init(int fd[2]) {
+int shell_init(int fd[2]) {
     switch (fork()) {
         case 0: { // child process -- read from efd & exec program
             char* prog_name;
             size_t prog_name_len;
             size_t argc;
             char** argv = NULL;
-    
-            printf("pausing child process\n");
 
             if (ipc_read_string(fd[0], &prog_name, &prog_name_len)) {
                 perror("unable to read program pipefd");
@@ -46,11 +44,10 @@ void shell_init(int fd[2]) {
                 perror("unable to read argc pipefd");
                 exit(1);
             }
-            if (argc > 0) {
-                argv = malloc(sizeof(char*) * (argc + 2));
-            }
 
-            memcpy(argv[0], prog_name, prog_name_len);
+            argv = malloc(sizeof(char*) * (argc + 2));
+            argv[0] = malloc(sizeof(char) * (prog_name_len + 1));
+            memcpy(argv[0], prog_name, prog_name_len + 1);
 
             size_t argv_len;
             for (size_t i = 1; i <= argc; i++) {
@@ -60,24 +57,20 @@ void shell_init(int fd[2]) {
                 }   
             }
 
-            printf("read name: \"%s\"\n", prog_name);
-            for (size_t i = 0; i <= argc; i++) {
-                printf(" - %s\n", argv[i]);
-            }
+            argv[argc + 1] = NULL;
 
-            if (execv(prog_name, argv) == -1) {
+            if (execvp(prog_name, argv) == -1) {
                 perror("");
-                return;
             }
-            break;
+            return 1;
         }
-        default: { // parent, main program.
+        default: { // parent
             char* pwd = getenv("PWD");
             char* shell = malloc(sizeof(char) * (strlen(pwd) + strlen(shell_name) + 2));
             sprintf(shell, "%s/%s", pwd, shell_name);
             setenv("shell", shell, 1);
             free(shell);
-            break;
+            return 0;
         }
     }
 }
@@ -203,17 +196,13 @@ int exec_progam(struct user_input* input, int fd[2]) {
         return 1;
     }
     for (int i = 0; i < input->argc; i++) {
-        if (ipc_write_string(fd[1], input->argv[i], strlen(input->argv[1]))) {
+        if (ipc_write_string(fd[1], input->argv[i], strlen(input->argv[i]))) {
             perror("unable to write args to pipefd");
             return 1;
         }
     }
 
-    printf("waiting for child to finish..\n");
-
     wait(NULL);
-
-    printf("child is done\n");
     return 0;
 }
 
