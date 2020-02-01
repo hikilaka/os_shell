@@ -12,4 +12,6 @@
         exit(1);                                \
     } while(0);
 
-int shell_repl(void);
+void shell_init(int fd[2]);
+
+int shell_repl(int fd[2]);

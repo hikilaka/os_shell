@@ -42,10 +42,12 @@ int integrated_cmds_register(void) {
 #define ignore_args() do { (void) argc; (void) argv; } while(0)
 
 cmd(env_list) {
-    ignore_args();
-
-    for (size_t i = 0; environ[i] != NULL; i++) {
-        printf("%s\n", environ[i]);
+    if (argc > 0) {
+        printf("%s\n", getenv(argv[0]));
+    } else {
+        for (size_t i = 0; environ[i] != NULL; i++) {
+            printf("%s\n", environ[i]);
+        }
     }
 
     return 0;
@@ -102,7 +104,14 @@ cmd(screen_clear) {
 }
 
 cmd(screen_write) {
-    ignore_args();
+    for (int i = 0; i < argc; i++) {
+        write(STDOUT_FILENO, argv[i], strlen(argv[i]));
+
+        if (i + 1 < argc) {
+            write(STDOUT_FILENO, " ", sizeof(char));
+        }
+    }
+    write(STDOUT_FILENO, "\n", sizeof(char));
     return 0;
 }
 

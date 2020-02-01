@@ -10,6 +10,7 @@ add_executable(oshell
     "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/command.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/integrated_commands.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ipc_codec.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/shell.c")
 
 target_include_directories(oshell PUBLIC
